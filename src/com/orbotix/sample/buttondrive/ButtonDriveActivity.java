@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 import orbotix.robot.base.*;
 import orbotix.robot.sensor.DeviceSensorsData;
 import orbotix.robot.sensor.LocatorData;
+import orbotix.robot.widgets.calibration.CalibrationView;
 import orbotix.view.connection.SpheroConnectionView;
 import orbotix.view.connection.SpheroConnectionView.OnRobotConnectionEventListener;
 
@@ -113,6 +115,10 @@ public class ButtonDriveActivity extends Activity implements OnItemSelectedListe
                         
                         //Set the AsyncDataListener that will process each response.
                         DeviceMessenger.getInstance().addAsyncDataListener(mRobot, mDataListener); 
+
+                        // Let Calibration View know which robot we are connected to
+                        CalibrationView calibrationView = (CalibrationView)findViewById(R.id.calibration_widget);
+                        calibrationView.setRobot(mRobot);
                     }
                 }, 1000);
 			}
@@ -219,6 +225,16 @@ public class ButtonDriveActivity extends Activity implements OnItemSelectedListe
     }
 
     /**
+     * Calibrate Sphero when a two finger event occurs
+     */
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        CalibrationView calibrationView = (CalibrationView)findViewById(R.id.calibration_widget);
+        // Notify Calibration widget of a touch event
+        calibrationView.interpretMotionEvent(event);
+        return super.dispatchTouchEvent(event);
+    }
+
+    /**
      * When the user clicks the configure button, it calls this function
      * @param v
      */
@@ -233,15 +249,15 @@ public class ButtonDriveActivity extends Activity implements OnItemSelectedListe
         // Flag will be true if the check box is clicked, false if it is not
         // When the flag is off (default behavior) the x, y locator grid is rotated with the calibration
         // When the flag is on the x, y locator grid is fixed and Sphero simply calibrates within it
-        int flag = /*((CheckBox)findViewById(R.id.checkbox_flag)).isChecked() ?
-                        ConfigureLocatorCommand.ROTATE_WITH_CALIBRATE_FLAG_ON :*/
-                        ConfigureLocatorCommand.ROTATE_WITH_CALIBRATE_FLAG_OFF;
+        /*int flag = ((CheckBox)findViewById(R.id.checkbox_flag)).isChecked() ?
+                        ConfigureLocatorCommand.ROTATE_WITH_CALIBRATE_FLAG_ON :
+                        ConfigureLocatorCommand.ROTATE_WITH_CALIBRATE_FLAG_OFF;*/
+        // TODO: which flag do we want???
+//        int flag = ConfigureLocatorCommand.ROTATE_WITH_CALIBRATE_FLAG_ON;
+        int flag = ConfigureLocatorCommand.ROTATE_WITH_CALIBRATE_FLAG_OFF;
 
         ConfigureLocatorCommand.sendCommand(mRobot, flag, newX, newY, newYaw);
     }
-
-    private double tempDestX;
-    private double tempDestY;
 
     /**
      * When the user clicks the go button, it calls this function
@@ -253,9 +269,7 @@ public class ButtonDriveActivity extends Activity implements OnItemSelectedListe
         if (mDest.equals("A")) {
             Log.d("Sphero", "Going to " + mDest);
             // TODO: implement
-            tempDestX = 0;
-            tempDestY = 0;
-            RollCommand.sendCommand(mRobot, 315f, 0.5f);
+            //RollCommand.sendCommand(mRobot, 315f, 0.5f);
         } else if (mDest.equals("B")) {
             Log.d("Sphero", "Going to " + mDest);
         } else if (mDest.equals("C")) {

@@ -151,11 +151,15 @@
 
 
     <!-- Calibration View must be in a FrameLayout to work, since it draws over top the other objects -->
-<!--
     <orbotix.robot.widgets.calibration.CalibrationView
         android:id="@+id/calibration_widget"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+<!--
+    	<orbotix.robot.widgets.calibration.CalibrationView
+	    android:id="@+id/CalibrationView"
+		android:layout_width="fill_parent"
+	    android:layout_height="fill_parent"/>
 -->
 <!-- End -->
 <!--
