@@ -29,7 +29,17 @@
         android:layout_marginTop="60dp"
         android:onClick="onGoPressed"
         android:text="Go" />
-
+<!--
+    <Button
+        android:id="@+id/stop_button"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/go_button"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="60dp"
+        android:onClick="onStopPressed"
+        android:text="Stop" />
+-->
     <Button
         android:id="@+id/calibrate_button"
         android:layout_width="100dp"

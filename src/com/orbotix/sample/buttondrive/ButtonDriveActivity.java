@@ -265,7 +265,6 @@ public class ButtonDriveActivity extends Activity implements OnItemSelectedListe
      */
     public void onGoPressed(View v) {
         String tempDest = mDest;
-
         if (mDest.equals("A")) {
             Log.d("Sphero", "Going to " + mDest);
             // TODO: implement
@@ -283,6 +282,12 @@ public class ButtonDriveActivity extends Activity implements OnItemSelectedListe
         } else if (mDest.equals("G")) {
             Log.d("Sphero", "Going to " + mDest);
         } else if (mDest.equals("H")) {
+            Log.d("Sphero", "Going to " + mDest);
+        } else if (mDest.equals("I")) {
+            Log.d("Sphero", "Going to " + mDest);
+        } else if (mDest.equals("J")) {
+            Log.d("Sphero", "Going to " + mDest);
+        } else if (mDest.equals("K")) {
             Log.d("Sphero", "Going to " + mDest);
         }
     }
@@ -318,7 +323,17 @@ public class ButtonDriveActivity extends Activity implements OnItemSelectedListe
         case 7:
             mDest = "H";
             break;
+        case 8:
+            mDest = "I";
+            break;
+        case 9:
+            mDest = "J";
+            break;
+        case 10:
+            mDest = "K";
+            break;
         }
+        Parser.setDestination(mDest);
         Log.d("Sphero", "after User selected " + mDest + ", pos=" + pos);
 	}
 
