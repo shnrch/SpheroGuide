@@ -1,4 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Button Drive</string>
+
+    <string-array name="nodes_array">
+        <item>Node A</item>
+        <item>Node B</item>
+        <item>Node C</item>
+        <item>Node D</item>
+        <item>Node E</item>
+        <item>Node F</item>
+        <item>Node G</item>
+        <item>Node H</item>
+    </string-array>
 </resources>
