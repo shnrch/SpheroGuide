@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#ff888888" >
+
+    <RelativeLayout
+        android:id="@+id/back_layout"
+        android:descendantFocusability="beforeDescendants"
+        android:focusableInTouchMode="true"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="#ff888888" >
+<!-- Begin -->
+    <Spinner
+        android:id="@+id/choose_node_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="100dp" />
+
+    <Button
+        android:id="@+id/go_button"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/choose_node_spinner"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="60dp"
+        android:onClick="onGoPressed"
+        android:text="Go" />
+<!--
+    <Button
+        android:id="@+id/stop_button"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/go_button"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="60dp"
+        android:onClick="onStopPressed"
+        android:text="Stop" />
+-->
+    <Button
+        android:id="@+id/calibrate_button"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/go_button"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="60dp"
+        android:onClick="onCalibratePressed"
+        android:text="Calibrate" />
+
+    <LinearLayout android:orientation="vertical"
+        android:layout_below="@+id/calibrate_button"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+                <TextView
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Locator"
+                        android:textSize="20sp"
+                        android:textColor="@android:color/black"
+                        android:paddingLeft="10dp"
+                        />
+
+                <!-- Locator Position X Label -->
+                <LinearLayout android:orientation="horizontal"
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"
+                        >
+
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text=" x: "
+                            android:paddingLeft="10dp"
+                            />
+
+                    <TextView
+                            android:id="@+id/txt_locator_x"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0 cm"
+                            android:paddingLeft="10dp"
+                            />
+
+                </LinearLayout>
+
+                <!-- Locator Position Y Label -->
+                <LinearLayout android:orientation="horizontal"
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"
+                        >
+
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text=" y: "
+                            android:paddingLeft="10dp"
+                            />
+
+                    <TextView
+                            android:id="@+id/txt_locator_y"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0 cm"
+                            android:paddingLeft="10dp"
+                            />
+
+                </LinearLayout>
+
+                <!-- Locator Velocity X Label -->
+                <LinearLayout android:orientation="horizontal"
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"
+                        >
+
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Vx: "
+                            android:paddingLeft="10dp"
+                            />
+
+                    <TextView
+                            android:id="@+id/txt_locator_vx"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0 cm/s"
+                            android:paddingLeft="10dp"
+                            />
+
+                </LinearLayout>
+
+                <!-- Locator Velocity Y Label -->
+                <LinearLayout android:orientation="horizontal"
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"
+                        >
+
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Vy: "
+                            android:paddingLeft="10dp"
+                            />
+
+                    <TextView
+                            android:id="@+id/txt_locator_vy"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0 cm/s"
+                            android:paddingLeft="10dp"
+                            />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+    <!-- Calibration View must be in a FrameLayout to work, since it draws over top the other objects -->
+    <orbotix.robot.widgets.calibration.CalibrationView
+        android:id="@+id/calibration_widget"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+<!--
+    	<orbotix.robot.widgets.calibration.CalibrationView
+	    android:id="@+id/CalibrationView"
+		android:layout_width="fill_parent"
+	    android:layout_height="fill_parent"/>
+-->
+<!-- End -->
+<!--
+        <Button
+            android:id="@+id/stop_button"
+            style="@style/ControlButton"
+            android:layout_centerInParent="true"
+            android:onClick="onStopClick"
+            android:text="STOP" />
+
+        <Button
+            android:id="@+id/zero_button"
+            style="@style/ControlButton"
+            android:layout_above="@id/stop_button"
+            android:layout_alignLeft="@id/stop_button"
+            android:onClick="onControlClick"
+            android:text="0˚" />
+
+        <Button
+            android:id="@+id/ninety_button"
+            style="@style/ControlButton"
+            android:layout_alignTop="@id/stop_button"
+            android:layout_toRightOf="@id/stop_button"
+            android:onClick="onControlClick"
+            android:text="90˚" />
+
+        <Button
+            android:id="@+id/one_eighty_button"
+            style="@style/ControlButton"
+            android:layout_alignLeft="@id/stop_button"
+            android:layout_below="@id/stop_button"
+            android:onClick="onControlClick"
+            android:text="180˚" />
+
+        <Button
+            android:id="@+id/two_seventy_button"
+            style="@style/ControlButton"
+            android:layout_alignTop="@id/stop_button"
+            android:layout_toLeftOf="@id/stop_button"
+            android:onClick="onControlClick"
+            android:text="270˚" />
+-->
+    </RelativeLayout>
+    
+    <orbotix.view.connection.SpheroConnectionView
+        android:id="@+id/sphero_connection_view"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="#A0000000" />
+
+</FrameLayout>
