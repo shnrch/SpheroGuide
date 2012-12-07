@@ -218,7 +218,7 @@ public class ButtonDriveActivity extends Activity
     }
 
     public void upPressed(View v) {
-    	rbtCtrl = new SpheroControl(mRobot, 0, 100, this); // TODO static 100cm ahead
+    	rbtCtrl = new SpheroControl(mRobot, 0, 300, this); // TODO static 100cm ahead
         Thread t = new Thread(rbtCtrl);
         t.start();
     }
