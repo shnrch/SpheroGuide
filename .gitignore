@@ -2,8 +2,8 @@
 ## Eclipse
 #################
 
+#.project #useful for easier checkout
 *.pydevproject
-.project
 .metadata
 bin/
 tmp/
