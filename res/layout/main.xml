@@ -13,7 +13,7 @@
         android:background="#ff888888" >
 <!-- Begin -->
     <Spinner
-        android:id="@+id/choose_node_spinner"
+        android:id="@+id/choose_node_spinn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -27,7 +27,6 @@
         android:layout_below="@+id/choose_node_spinner"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="60dp"
-        android:onClick="onGoPressed"
         android:text="Go" />
 <!--
     <Button
