@@ -24,10 +24,19 @@
         android:id="@+id/go_button"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/choose_node_spinner"
+        android:layout_below="@+id/choose_node_spinn"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="60dp"
         android:text="Go" />
+    
+    <Button
+        android:id="@+id/btn_stop"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/go_button"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="60dp"
+        android:text="EStop" />
 <!--
     <Button
         android:id="@+id/stop_button"
