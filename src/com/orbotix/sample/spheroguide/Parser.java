@@ -2,7 +2,6 @@ package com.orbotix.sample.spheroguide;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.util.StringTokenizer;
 
 public class Parser {

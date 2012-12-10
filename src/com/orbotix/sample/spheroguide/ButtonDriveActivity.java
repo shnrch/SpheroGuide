@@ -1,11 +1,13 @@
 package com.orbotix.sample.spheroguide;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import orbotix.robot.base.ConfigureLocatorCommand;
 import orbotix.robot.base.DeviceAsyncData;
 import orbotix.robot.base.DeviceMessenger;
 import orbotix.robot.base.DeviceSensorsAsyncData;
+import orbotix.robot.base.RGBLEDOutputCommand;
 import orbotix.robot.base.Robot;
 import orbotix.robot.base.RobotProvider;
 import orbotix.robot.base.RollCommand;
@@ -29,6 +31,8 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.orbotix.sample.spheroguide.PathProvider.PositionPolar;
+
 
 /**
  * Activity for controlling the Sphero with five control buttons.
@@ -50,8 +54,8 @@ public class ButtonDriveActivity extends Activity implements OnItemSelectedListe
     /**
      * Robot to control
      */
-    private Robot mRobot;
-    private SpheroControl mSpheroController;
+    private Robot mRobot = null;
+    private SpheroControl mSpheroController = null;
 
     /**
      * The Sphero Connection View
@@ -180,6 +184,7 @@ public class ButtonDriveActivity extends Activity implements OnItemSelectedListe
                         DeviceMessenger.getInstance().addAsyncDataListener(mRobot, mDataListener); 
                         
                         // stop robot (in case the former application ran into a deadlock)
+                        RGBLEDOutputCommand.sendCommand(mRobot, 255, 255, 0);
         				RollCommand.sendStop(mRobot);
         				
                         // Let Calibration View know which robot we are connected to
@@ -206,11 +211,32 @@ public class ButtonDriveActivity extends Activity implements OnItemSelectedListe
 			
 			@Override
 			public void onClick(View v) {
-				Log.e(eTag, "init control");
 				
-				mSpheroController = new SpheroControl(mRobot, 0, 120); // TODO static 100cm ahead
+				// global coords
+				LinkedList<PositionPolar<Double>> points = new LinkedList<PositionPolar<Double>>();
+				points.add(new PositionPolar<Double>(0. , 60.)); // angle, distance
+				points.add(new PositionPolar<Double>(90., 60.));
+				points.add(new PositionPolar<Double>(180.,60.));
+				points.add(new PositionPolar<Double>(270.,60.));
+				
+				SpheroPath<Double> path = new SpheroPath<Double>(points);
+				
+				mSpheroController = new SpheroControl(mRobot, path);
 			    Thread t = new Thread(mSpheroController);
 			    t.start();
+			}
+		});
+        
+        Button btnEStop = (Button) findViewById(R.id.btn_stop);
+        btnEStop.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				
+				if (mSpheroController != null) {
+					mSpheroController.stop();
+				}
+			    
 			}
 		});
     }
@@ -233,6 +259,9 @@ public class ButtonDriveActivity extends Activity implements OnItemSelectedListe
     protected void onStop() {
         super.onStop();
 
+        if (mSpheroController != null)
+        	mSpheroController.stop();
+        
         //disconnect robot
         mSpheroConnectionView.shutdown();
         RobotProvider.getDefaultProvider().disconnectControlledRobots();
