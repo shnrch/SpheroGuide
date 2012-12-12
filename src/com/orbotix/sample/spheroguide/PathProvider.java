@@ -7,9 +7,9 @@ public interface PathProvider<K extends Number> {
 		
 	}
 	
-	public class PositionRelative<T> implements Position<T> {
+	public class PositionAbsolute<T> implements Position<T> {
 		public T mX, mY;
-		PositionRelative (T x, T y) {
+		PositionAbsolute (T x, T y) {
 			mX = x;
 			mY = y;
 		}

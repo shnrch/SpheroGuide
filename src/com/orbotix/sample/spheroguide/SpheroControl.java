@@ -3,6 +3,8 @@ package com.orbotix.sample.spheroguide;
 import java.util.EnumMap;
 import java.util.Map;
 
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+
 import orbotix.robot.base.RGBLEDOutputCommand;
 import orbotix.robot.base.Robot;
 import orbotix.robot.base.RollCommand;
@@ -10,7 +12,7 @@ import orbotix.robot.sensor.LocatorData;
 import android.util.Log;
 
 import com.orbotix.sample.spheroguide.PathProvider.PositionPolar;
-import com.orbotix.sample.spheroguide.PathProvider.PositionRelative;
+import com.orbotix.sample.spheroguide.PathProvider.PositionAbsolute;
 
 /**
  * 
@@ -39,13 +41,15 @@ public class SpheroControl implements Runnable {
     
     private LocatorData lData;
     private SpheroPath<Double> mPath;
-    private PositionRelative<Double> oldWp;
+    private PositionAbsolute<Double> mOldWp;
+    private PositionAbsolute<Double> mCurGoalWP;
+    private float mWPAngle;
+    private double mWPDistance;
 		
 	private boolean mIsRunning = true;
 
 	private boolean mHasUpdatedLocPos = false;
 
-	private PositionPolar<Double> mCurGoalWP;
 
 	private double mControlFreq = 20.; // Hz
 	
@@ -79,8 +83,10 @@ public class SpheroControl implements Runnable {
 		mIsRunning          = true;
 		mPath               = path;
 		
-		mCurGoalWP = (PositionPolar<Double>) mPath.getNextWaypoint();
-		oldWp      = new PositionRelative<Double>(0., 0.);
+		mCurGoalWP = (PositionAbsolute<Double>) mPath.getNextWaypoint();
+		mOldWp      = new PositionAbsolute<Double>(0., 0.);
+		
+		calculateDistanceAndAngle();
 		
 		// init color codes
 		int[][] mStateColors = {{255,0,0},{0,255,0},{0,0,255},
@@ -160,11 +166,11 @@ public class SpheroControl implements Runnable {
 
 	private boolean move() {
 		// quad. error
-		double distX = lData.getPositionX() - oldWp.mX;
-		double distY = lData.getPositionY() - oldWp.mY;
+		double distX = lData.getPositionX() - mOldWp.mX;
+		double distY = lData.getPositionY() - mOldWp.mY;
 		double dist  = Math.sqrt(distX * distX + distY * distY);
 		
-		double err_2 = Math.pow(mCurGoalWP.distance.doubleValue() - dist, 2.0);
+		double err_2 = Math.pow(mWPDistance - dist, 2.0);
 		double qErr   = Math.sqrt(err_2);
 		
 		// slow down before reaching WP
@@ -174,7 +180,7 @@ public class SpheroControl implements Runnable {
 			RollCommand.sendStop(mRobot);
 			return true;
 		} else {
-			RollCommand.sendCommand(mRobot, mCurGoalWP.angle.floatValue(), maxSpeed * dVel);
+			RollCommand.sendCommand(mRobot, mWPAngle, maxSpeed * dVel);
 			return false;
 		}
 	}
@@ -182,8 +188,11 @@ public class SpheroControl implements Runnable {
 	private boolean prepareNextMove() throws InterruptedException {
 		
 		if (mPath.hasNext()) {
-			mCurGoalWP = (PositionPolar<Double>) mPath.getNextWaypoint();
-			oldWp = new PositionRelative<Double>((double) lData.getPositionX(), (double)lData.getPositionY());
+			mCurGoalWP = (PositionAbsolute<Double>) mPath.getNextWaypoint();
+			mOldWp = new PositionAbsolute<Double>((double) lData.getPositionX(), (double)lData.getPositionY());
+			
+			calculateDistanceAndAngle();
+			
 			Thread.sleep(1000);
 			
 			return false;			
@@ -195,6 +204,28 @@ public class SpheroControl implements Runnable {
 			
 	}
 
+
+	private void calculateDistanceAndAngle() {
+		double x2 = mCurGoalWP.mX - mOldWp.mX;
+		double y2 = mCurGoalWP.mY - mOldWp.mY;
+		mWPDistance = Math.sqrt(Math.pow(x2, 2.0) + Math.pow(y2, 2.0));
+		mWPAngle    = (float) (((Math.atan2(y2, x2) - (Math.PI / 2.)) * -1.) * (180 / Math.PI)) % 360;
+		
+		/*for (int i = 0; i< 3; ++i) {
+			
+			Log.e("Sphero", "Angle:    " + mWPAngle);
+			Log.e("Sphero", "Distance: " + mWPDistance);
+			Log.e("Sphero", "atan2     " + (Math.atan2(y2, x2) + (Math.PI/2.0)));
+			
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}*/
+		
+	}
 
 	/**
 	 * set LED corresponding to the current controller state

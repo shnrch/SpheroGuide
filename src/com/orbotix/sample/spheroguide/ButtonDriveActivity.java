@@ -31,6 +31,7 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.orbotix.sample.spheroguide.PathProvider.PositionAbsolute;
 import com.orbotix.sample.spheroguide.PathProvider.PositionPolar;
 
 
@@ -212,16 +213,28 @@ public class ButtonDriveActivity extends Activity implements OnItemSelectedListe
 			private SpheroPath<Double> getDummyWaypoints() {
 				
 				// in global coords
-				LinkedList<PositionPolar<Double>> points = new LinkedList<PositionPolar<Double>>();
-				points.add(new PositionPolar<Double>(0. , 60.)); // angle, distance
-				points.add(new PositionPolar<Double>(90., 60.));
-				points.add(new PositionPolar<Double>(180.,60.));
-				points.add(new PositionPolar<Double>(270.,60.));
-				points.add(new PositionPolar<Double>(45.,85.));
-				points.add(new PositionPolar<Double>(180.,60.));
-				points.add(new PositionPolar<Double>(270.,60.));
+//				LinkedList<PositionPolar<Double>> points = new LinkedList<PositionPolar<Double>>();
+//				points.add(new PositionPolar<Double>(0. , 60.)); // angle, distance
+//				points.add(new PositionPolar<Double>(90., 60.));
+//				points.add(new PositionPolar<Double>(180.,60.));
+//				points.add(new PositionPolar<Double>(270.,60.));
+//				points.add(new PositionPolar<Double>(45.,85.));
+//				points.add(new PositionPolar<Double>(180.,60.));
+//				points.add(new PositionPolar<Double>(270.,60.));
 				
-				SpheroPath<Double> path = new SpheroPath<Double>(points);
+				/*
+				 * Sphero Coordinates
+				 * Y - straight ahead 
+				 * X - to the right
+				 * */
+				LinkedList<PositionAbsolute<Double>> pointsAbs = new LinkedList<PositionAbsolute<Double>>();
+				pointsAbs.add(new PositionAbsolute<Double>(75., 0.));
+				pointsAbs.add(new PositionAbsolute<Double>(75., 75.));
+				pointsAbs.add(new PositionAbsolute<Double>(0., 75.));
+				pointsAbs.add(new PositionAbsolute<Double>(0., 0.));
+				
+				
+				SpheroPath<Double> path = new SpheroPath<Double>(pointsAbs);
 				
 				return path;
 			}

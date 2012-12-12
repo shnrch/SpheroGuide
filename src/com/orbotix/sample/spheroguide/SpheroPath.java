@@ -6,21 +6,21 @@ import java.util.LinkedList;
 public class SpheroPath<K extends Number> implements PathProvider<K> {
 	
 	private int curId = 0;
-	private LinkedList<PositionPolar<K>> waypoints = 
-			new LinkedList<PositionPolar<K>>();
+	private LinkedList<PositionAbsolute<K>> waypoints = 
+			new LinkedList<PositionAbsolute<K>>();
 	
-	public SpheroPath(Collection<com.orbotix.sample.spheroguide.PathProvider.Position<K>> points) {
-		waypoints.add(new PositionPolar<K>(null, null));
+	public SpheroPath(Collection<PositionAbsolute<K>> points) {
+		waypoints.addAll(points);
 		
-		// FIXME CONVERT
 	}
 	
 	public SpheroPath(LinkedList<PositionPolar<K>> points) {
-		waypoints.addAll(points);
+//		waypoints.addAll(points);
+		// FIXME CONVERT
 	}
 
 	@Override
-	public com.orbotix.sample.spheroguide.PathProvider.Position<K> getNextWaypoint() {
+	public PositionAbsolute<K> getNextWaypoint() {
 		if (hasNext()) {
 			return waypoints.get(curId++);
 		} else {
@@ -33,7 +33,7 @@ public class SpheroPath<K extends Number> implements PathProvider<K> {
 		return waypoints.size() > curId;
 	}
 
-	public LinkedList<PositionPolar<K>> getListOfPoints() {
+	public LinkedList<PositionAbsolute<K>> getListOfPoints() {
 		return waypoints;
 	}
 }
