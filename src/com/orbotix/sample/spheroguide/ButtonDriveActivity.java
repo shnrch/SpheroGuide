@@ -50,6 +50,7 @@ public class ButtonDriveActivity extends Activity implements OnItemSelectedListe
     private int mPacketCounter;
         
     private Handler mHandler = new Handler();
+    private Thread  mSpheroCtrlHandler = null;
 
     /**
      * Robot to control
@@ -119,25 +120,10 @@ public class ButtonDriveActivity extends Activity implements OnItemSelectedListe
         int newY = 0;   // The locator's current Y position value will be set to this value
         int newYaw = 0; // The yaw value you set this to, will represent facing down the +y_axis
 
-//        // Try parsing the integer values from the edit text boxes, if not, use zeros
-//        try {
-//            newX = Integer.parseInt(((EditText)findViewById(R.id.edit_new_x)).getText().toString());
-//        } catch (NumberFormatException e) {}
-//
-//        try {
-//            newY = Integer.parseInt(((EditText)findViewById(R.id.edit_new_y)).getText().toString());
-//        } catch (NumberFormatException e) {}
-//
-//        try {
-//            newYaw = Integer.parseInt(((EditText)findViewById(R.id.edit_new_yaw)).getText().toString());
-//        } catch (NumberFormatException e) {}
-
         // Flag will be true if the check box is clicked, false if it is not
         // When the flag is off (default behavior) the x, y locator grid is rotated with the calibration
         // When the flag is on the x, y locator grid is fixed and Sphero simply calibrates within it
-        int flag = true ? // FIXME
-                        ConfigureLocatorCommand.ROTATE_WITH_CALIBRATE_FLAG_ON :
-                        ConfigureLocatorCommand.ROTATE_WITH_CALIBRATE_FLAG_OFF;
+        int flag = ConfigureLocatorCommand.ROTATE_WITH_CALIBRATE_FLAG_ON;
 
         ConfigureLocatorCommand.sendCommand(mRobot, flag, newX, newY, newYaw);
     }
@@ -212,18 +198,32 @@ public class ButtonDriveActivity extends Activity implements OnItemSelectedListe
 			@Override
 			public void onClick(View v) {
 				
-				// global coords
+				// TODO get WayPoint from Dropdown
+				// TODO get Path from CSV Parser
+				
+				SpheroPath<Double> path = getDummyWaypoints();
+				
+				mSpheroController = new SpheroControl(mRobot, path);
+				mSpheroCtrlHandler = new Thread(mSpheroController);
+				mSpheroCtrlHandler.start();
+			}
+
+			// TODO remove this dummy method as soon as Waypoint Parser is working
+			private SpheroPath<Double> getDummyWaypoints() {
+				
+				// in global coords
 				LinkedList<PositionPolar<Double>> points = new LinkedList<PositionPolar<Double>>();
 				points.add(new PositionPolar<Double>(0. , 60.)); // angle, distance
 				points.add(new PositionPolar<Double>(90., 60.));
 				points.add(new PositionPolar<Double>(180.,60.));
 				points.add(new PositionPolar<Double>(270.,60.));
+				points.add(new PositionPolar<Double>(45.,85.));
+				points.add(new PositionPolar<Double>(180.,60.));
+				points.add(new PositionPolar<Double>(270.,60.));
 				
 				SpheroPath<Double> path = new SpheroPath<Double>(points);
 				
-				mSpheroController = new SpheroControl(mRobot, path);
-			    Thread t = new Thread(mSpheroController);
-			    t.start();
+				return path;
 			}
 		});
         
@@ -242,17 +242,6 @@ public class ButtonDriveActivity extends Activity implements OnItemSelectedListe
     }
 
     /**
-     * When the user clicks "STOP", stop the Robot.
-     * @param v The View that had been clicked
-     */
-    public void onStopClick(View v){
-
-        if(mRobot != null){
-            mSpheroController.stop();
-        }
-    }
-
-    /**
      * Disconnect from the robot when the Activity stops
      */
     @Override
@@ -262,11 +251,21 @@ public class ButtonDriveActivity extends Activity implements OnItemSelectedListe
         if (mSpheroController != null)
         	mSpheroController.stop();
         
+        try {
+			mSpheroCtrlHandler.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
         //disconnect robot
         mSpheroConnectionView.shutdown();
         RobotProvider.getDefaultProvider().disconnectControlledRobots();
     }
 
+    /**
+     * 
+     */
     private void requestDataStreaming(){
 
         if(mRobot == null) return;

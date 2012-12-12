@@ -49,7 +49,9 @@ public class SpheroControl implements Runnable {
 
 	private double mControlFreq = 20.; // Hz
 	
-	private static double posError = 3.;
+	private static double posError = 3.; // cm
+	private final double brakeZone = 20; // cm
+	private final float  maxSpeed  = 0.6f; // ratio of sphero's max. velocity
 	
 	
 	enum LEDColor {
@@ -108,35 +110,36 @@ public class SpheroControl implements Runnable {
 	 * 
 	 * @throws InterruptedException 
 	 */	
-	public void update() throws InterruptedException {
+	public synchronized void update() throws InterruptedException {
 		
 		boolean transitionCheck = false;
-		
-		if (!mHasUpdatedLocPos)
-			return ;
+		SpheroState transState  = SpheroState.STATE_INITIAL;
 		
 		// set LED according to current state
 		updateSpheroLED();
+		
+		if (!mHasUpdatedLocPos)
+			return;	
 		
 		switch (mState) {
 		
 		case STATE_INITIAL:
 			transitionCheck = init();
-			mState = (transitionCheck) ? SpheroState.STATE_MOVING : SpheroState.STATE_ERROR;
+			transState = (transitionCheck) ? SpheroState.STATE_MOVING : SpheroState.STATE_ERROR;
 			break;
 			
 		case STATE_MOVING:
 			transitionCheck = move();
-			mState = (transitionCheck) ? SpheroState.STATE_WP_REACHED : SpheroState.STATE_MOVING;
+			transState = (transitionCheck) ? SpheroState.STATE_WP_REACHED : SpheroState.STATE_MOVING;
 			break;
 		case STATE_WP_REACHED: // <!- successfully reached WP
 			transitionCheck = prepareNextMove();
-			mState = (transitionCheck) ? SpheroState.STATE_GOAL_REACHED : SpheroState.STATE_MOVING;
+			transState = (transitionCheck) ? SpheroState.STATE_GOAL_REACHED : SpheroState.STATE_MOVING;
 			break;
 			
 		case STATE_GOAL_REACHED:
 			transitionCheck = endOfMotion();
-			mState = (transitionCheck) ? SpheroState.STATE_GOAL_REACHED : SpheroState.STATE_ERROR;
+			transState = (transitionCheck) ? SpheroState.STATE_GOAL_REACHED : SpheroState.STATE_ERROR;
 			break;
 			
 		case STATE_IAM_LOST: // <!- Sphero got off track
@@ -145,9 +148,12 @@ public class SpheroControl implements Runnable {
 			mIsRunning = false;
 		
 		default:
-			mState = SpheroState.STATE_ERROR;
+			transState = SpheroState.STATE_ERROR;
 			
-		}		
+		}
+		
+		// proceed state change
+		changeState(transState);
 	}
 
 	
@@ -162,13 +168,13 @@ public class SpheroControl implements Runnable {
 		double qErr   = Math.sqrt(err_2);
 		
 		// slow down before reaching WP
-//		float dVel = (qErr > 50) ? 1.0f : (float) (qErr / 75.0f);
+		float dVel = (qErr > brakeZone) ? 1.0f : (float) (qErr / brakeZone);
 				
 		if (qErr < posError) { // TODO OR error is increasing 
 			RollCommand.sendStop(mRobot);
 			return true;
 		} else {
-			RollCommand.sendCommand(mRobot, mCurGoalWP.angle.floatValue(), 0.5f);
+			RollCommand.sendCommand(mRobot, mCurGoalWP.angle.floatValue(), maxSpeed * dVel);
 			return false;
 		}
 	}
@@ -184,7 +190,6 @@ public class SpheroControl implements Runnable {
 		} else {
 			
 			mCurGoalWP = null;
-			Thread.sleep(3000);
 			return true;
 		}
 			
@@ -231,7 +236,7 @@ public class SpheroControl implements Runnable {
 	}
 
 	private boolean endOfMotion() throws InterruptedException {
-		Thread.sleep(2000);
+		Thread.sleep(3000);
 		
 		Log.e("Sphero","Sphero has arrived");
 		// ends spheros journey
@@ -263,10 +268,16 @@ public class SpheroControl implements Runnable {
 		return mIsRunning ;
 	}
 
-	public void stop() {
+	public synchronized void stop() {
+		changeState(SpheroState.STATE_ERROR);
 		mIsRunning = false;
-		mState = SpheroState.STATE_ERROR;
 		updateSpheroLED();
+	}
+	
+	public synchronized void changeState(SpheroState newState) {
+		if (isRunning()) {
+			mState = newState;
+		}
 	}
 	
 
